@@ -403,19 +403,19 @@ pp.readRegexp = function() {
   ++this.pos
   let mods = "", flagsStart = this.pos
   let astral = this.options.ecmaVersion >= 6
-  while (this.pos < this.input.length) {
+  for (; this.pos < this.input.length; ++this.pos) {
     let ch = this.fullCharCodeAtPos()
     if (!isIdentifierChar(ch, astral)) break
-    this.pos += ch <= 0xffff ? 1 : 2
+    if (ch != 103 && ch != 105 && ch != 109 && // g, i, m
+      (this.options.ecmaVersion < 6 || (ch != 117 && ch != 121)) && // u, y
+      (this.options.ecmaVersion < 9 || ch != 115) // s
+    )
+      this.raise(this.pos, "Invalid regular expression flag")
   }
   mods = this.input.slice(flagsStart, this.pos)
 
   let tmp = content, tmpFlags = ""
   if (mods) {
-    let validFlags = /^[gim]*$/
-    if (this.options.ecmaVersion >= 6) validFlags = /^[gimuy]*$/
-    if (this.options.ecmaVersion >= 9) validFlags = /^[gimsuy]*$/
-    if (!validFlags.test(mods)) this.raise(start, "Invalid regular expression flag")
     if (mods.indexOf("u") >= 0) {
       if (regexpUnicodeSupport) {
         tmpFlags = "u"

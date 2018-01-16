@@ -14760,7 +14760,7 @@ test("/[a-z]/gimuy", {
     }
   ]
 }, {ecmaVersion: 6});
-testFail("/[a-z]/s", "Invalid regular expression flag (1:1)", {ecmaVersion: 6});
+testFail("/[a-z]/s", "Invalid regular expression flag (1:7)", {ecmaVersion: 6});
 test("/[a-z]/s", {
   "type": "Program",
   "start": 0,
