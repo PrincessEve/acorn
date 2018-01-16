@@ -401,9 +401,15 @@ pp.readRegexp = function() {
   }
   let content = this.input.slice(start, this.pos)
   ++this.pos
-  // Need to use `readWord1` because '\uXXXX' sequences are allowed
-  // here (don't ask).
-  let mods = this.readWord1()
+  let mods = "", flagsStart = this.pos
+  let astral = this.options.ecmaVersion >= 6
+  while (this.pos < this.input.length) {
+    let ch = this.fullCharCodeAtPos()
+    if (!isIdentifierChar(ch, astral)) break
+    this.pos += ch <= 0xffff ? 1 : 2
+  }
+  mods = this.input.slice(flagsStart, this.pos)
+
   let tmp = content, tmpFlags = ""
   if (mods) {
     let validFlags = /^[gim]*$/
